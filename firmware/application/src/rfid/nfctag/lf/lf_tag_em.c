@@ -51,7 +51,7 @@ static void lf_field_lost(void) {
  */
 bool is_lf_field_exists(void) {
     nrfx_lpcomp_enable();
-    bsp_delay_us(60);  // Display for a period of time and sampling to avoid misjudgment
+    bsp_delay_us(30);  // Display for a period of time and sampling to avoid misjudgment
     nrf_lpcomp_task_trigger(NRF_LPCOMP_TASK_SAMPLE);
     return nrf_lpcomp_result_get() == 1;  // Determine the sampling results of the LF field status
 }
