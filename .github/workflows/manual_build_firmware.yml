@@ -1,0 +1,17 @@
+name: Manual Firmware Build
+on:
+  workflow_dispatch:  # 手动触发开关
+    inputs:
+      checkout-sha:
+        description: 'Commit SHA to build (leave empty for latest)'
+        required: false
+        type: string
+
+jobs:
+  call_build_firmware:
+    uses: ./.github/workflows/build_firmware.yml  # 调用你提供的编译配置
+    with:
+      checkout-sha: ${{ github.event.inputs.checkout-sha }}
+    permissions:
+      packages: write  # 允许推送Docker镜像到GHCR
+      contents: read
