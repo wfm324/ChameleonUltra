@@ -84,8 +84,10 @@ static void lpcomp_event_handler(nrf_lpcomp_event_t event) {
     TAG_FIELD_LED_ON()
 
     // use precise hardware timer to broadcast card id
+    __disable_irq();  // ARM Cortex-M 原生指令，关闭所有可屏蔽中断
     nrfx_pwm_simple_playback(&m_broadcast, m_pwm_seq, LF_125KHZ_BROADCAST_MAX, NRFX_PWM_FLAG_STOP);
-
+    __enable_irq();   // 恢复全局中断
+    
     NRF_LOG_INFO("LF FIELD DETECTED");
 }
 
@@ -98,6 +100,13 @@ static void lpcomp_init(void) {
 
     ret_code_t err_code = nrfx_lpcomp_init(&cfg, lpcomp_event_handler);
     APP_ERROR_CHECK(err_code);
+   
+    // ========== 旧版 SDK 适配：直接配置 NVIC 中断优先级 ==========
+    // 核心：将 LPCOMP 中断优先级设为与 PWM 相同的 LOW 级别
+    // APP_IRQ_PRIORITY_LOW 是 SDK 宏，通常定义为 3（数值越大优先级越低）
+    NVIC_SetPriority(LPCOMP_IRQn, APP_IRQ_PRIORITY_LOW);
+    // 可选：确保中断使能（nrfx_lpcomp_init 已做，但补充防止遗漏）
+    NVIC_EnableIRQ(LPCOMP_IRQn);
 }
 
 static void pwm_handler(nrfx_pwm_evt_type_t event_type) {
@@ -112,7 +121,10 @@ static void pwm_handler(nrfx_pwm_evt_type_t event_type) {
     NRF_LPCOMP->INTENCLR = LPCOMP_INTENCLR_CROSS_Msk | LPCOMP_INTENCLR_UP_Msk | LPCOMP_INTENCLR_DOWN_Msk | LPCOMP_INTENCLR_READY_Msk;
     if (is_lf_field_exists()) {
         nrfx_lpcomp_disable();
+        // ========== 重广播时同样保护中断 ==========
+        __disable_irq();
         nrfx_pwm_simple_playback(&m_broadcast, m_pwm_seq, LF_125KHZ_BROADCAST_MAX, NRFX_PWM_FLAG_STOP);
+        __enable_irq();
     } else {
         lf_field_lost();
     }
