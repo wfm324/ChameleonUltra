@@ -21,7 +21,7 @@
 NRF_LOG_MODULE_REGISTER();
 
 #define ANT_NO_MOD() nrf_gpio_pin_clear(LF_MOD)
-#define LF_125KHZ_BROADCAST_MAX (20)
+#define LF_125KHZ_BROADCAST_MAX (10)
 
 // Whether the USB light effect is allowed to enable
 extern bool g_usb_led_marquee_enable;
