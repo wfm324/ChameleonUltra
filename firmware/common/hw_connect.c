@@ -116,8 +116,8 @@ void hw_connect_init(void) {
         LED_7           = (NRF_GPIO_PIN_MAP(0, 8));
         LED_8           = (NRF_GPIO_PIN_MAP(0, 6));
         LED_R           = (NRF_GPIO_PIN_MAP(0, 24));
-        LED_G           = (NRF_GPIO_PIN_MAP(0, 22));
-        LED_B           = (NRF_GPIO_PIN_MAP(1, 0));
+        LED_B           = (NRF_GPIO_PIN_MAP(0, 22));
+        LED_G           = (NRF_GPIO_PIN_MAP(1, 0));
         RGB_LIST_NUM    = 8;
         RGB_CTRL_NUM    = 3;
 
